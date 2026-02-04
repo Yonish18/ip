@@ -4,7 +4,10 @@ import java.util.ArrayList;
 public class Duke {
 
     private static String divider = "\u001B[34m" + "▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓\n";
-    private static ArrayList<String> items = new ArrayList<>();
+    private static String[] items = new String[100];
+    private static int itemQuantity = 0;
+    private static boolean[] isDone = new boolean[100];
+
     public static void main(String[] args) {
         String welcomeMsg = divider +
                 " >> CHOTU ACTIVATED <<\n" +
@@ -16,8 +19,8 @@ public class Duke {
                         " ║           CHOTU'S COMMAND MENU                         ║\n" +
                         " ╠════════════════════════════════════════════════════════╣\n" +
                         " ║  1. Echo Mode                                          ║\n" +
-                        " ║  2. Add/List Items                                     ║\n" +
-                        " ║  3. List Items                                         ║\n" +
+                        " ║  2. Add/List/Mark Items                                ║\n" +
+                        " ║                                                        ║\n" +
                         " ║                                                        ║\n" +
                         " ║  Enter 'Bye' -> Exit                                   ║\n" +
                         " ╚════════════════════════════════════════════════════════╝\n" +
@@ -44,12 +47,19 @@ public class Duke {
                 break;
 
             case "2":
-                System.out.println("Enter the items you would like to add to your list. Type 'list' to list your added items. Type 'bye' to exit\n");
+                System.out.println(divider + "Enter the items you would like to add to your list.\n" +
+                        "Type 'list' to list your added items.\n" +
+                        "Type 'mark'/'unmark' [ITEM NUMBER] to mark items as done/not done.\n" +
+                        "Type 'bye' to exit\n");
                 String input = takeUserInput();
-                if ((input.toLowerCase().equals("list"))) {
+                if ((input.toLowerCase().startsWith("list"))) {
                     listItems();
-                } else if(input.toLowerCase().equals("bye")) {
+                } else if(input.toLowerCase().startsWith("bye")) {
                     choice = "bye";
+                } else if(input.toLowerCase().startsWith("mark")) {
+                    markDone(Integer.parseInt(input.substring(5,6)) - 1);
+                } else if(input.toLowerCase().startsWith("unmark")) {
+                    markUndone(Integer.parseInt(input.substring(7,8)) - 1);
                 }
                 else{
                     addItem(input);
@@ -75,21 +85,26 @@ public class Duke {
     }
 
     public static void addItem(String item) {
-        items.add(item);
+        items[itemQuantity] = item;
+        itemQuantity += 1;
         System.out.println(divider + "added: " + item + "\n" + divider);
     }
 
     public static void listItems() {
-        if (items.isEmpty()) {
+        if (itemQuantity == 0) {2
             System.out.println(divider + " Your list is empty! Add some items first.\n" + divider);
             return;
         }
 
         System.out.print(divider);
-        for (int i = 0; i < items.size(); i++) {
-            System.out.println(" " + (i + 1) + ". " + items.get(i));
+        for (int i = 0; i < itemQuantity; i++) {
+            if (isDone[i]) {
+                System.out.println(" " + (i + 1) + ". " + "[X] " + items[i]);
+            } else {
+                System.out.println(" " + (i + 1) + ". " + "[ ] " + items[i]);
+            }
+            System.out.print(divider);
         }
-        System.out.print(divider);
     }
 
     public static boolean validChoice(String choice) {
@@ -97,5 +112,15 @@ public class Duke {
             return true;
         }
         return false;
+    }
+
+    public static void markDone(int index) {
+        isDone[index] = true;
+        System.out.println(divider + "Nice! I've marked this task as done:\n" + " [X] " + items[index] + "\n" + divider);
+    }
+
+    public static void markUndone(int index) {
+        isDone[index] = false;
+        System.out.println(divider + "OK, I've marked this task as not done yet:\n" + " [ ] " + items[index] + "\n" + divider);
     }
 }
