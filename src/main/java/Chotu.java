@@ -71,6 +71,7 @@ public class Chotu {
     }
 
     public static void echo() {
+        System.out.print(divider + "Welcome to Echo mode. I'll repeat what you say!\n");
         String userInput = takeUserInput();
         while (!(userInput.toLowerCase().equals("bye"))) {
             System.out.println(divider + userInput + "\n" + divider);
@@ -90,7 +91,7 @@ public class Chotu {
     }
 
     public static void listItems() {
-        if (itemQuantity == 0) {2
+        if (itemQuantity == 0) {
             System.out.println(divider + " Your list is empty! Add some items first.\n" + divider);
             return;
         }
@@ -102,8 +103,9 @@ public class Chotu {
             } else {
                 System.out.println(" " + (i + 1) + ". " + "[ ] " + items[i]);
             }
-            System.out.print(divider);
+
         }
+        System.out.print(divider);
     }
 
     public static boolean validChoice(String choice) {
