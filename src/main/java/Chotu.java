@@ -3,6 +3,7 @@ import java.util.Scanner;
 public class Chotu {
 
     final private static String divider = "\u001B[34m" + "▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓\n";
+    private static final Scanner SCANNER = new Scanner(System.in);
     private static Task[] tasks = new Task[100];
     private static int numTasks = 0;
     private static String TaskMenuMsg = divider + "Enter the tasks you would like to add to your list." +
@@ -95,8 +96,7 @@ public class Chotu {
     }
 
     public static String takeUserInput() {
-        Scanner sc = new Scanner(System.in);
-        return sc.nextLine();
+        return SCANNER.nextLine();
     }
 
     public static void addItem(Task task) {
@@ -177,4 +177,3 @@ public class Chotu {
                 divider);
     }
 }
-
