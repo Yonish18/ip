@@ -2,14 +2,11 @@ import java.util.Scanner;
 
 public class Chotu {
 
-    final private static String divider = "\u001B[34m" + "▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓\n";
+    private static final String DIVIDER = "▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓\n";
     private static final Scanner SCANNER = new Scanner(System.in);
     private static Task[] tasks = new Task[100];
     private static int numTasks = 0;
-    private static String TaskMenuMsg = divider + "Enter the tasks you would like to add to your list." +
-            "Type 'list' to list your added tasks." +
-        "Type 'mark'/'unmark' [ITEM NUMBER] to mark tasks as done/not done." +
-        "Type 'bye' to exit";
+    private static String TaskMenuMsg = buildTaskMenuMsg();
     private static String menu =
             " ╔════════════════════════════════════════════════════════╗\n" +
                     " ║           CHOTU'S COMMAND MENU                         ║\n" +
@@ -22,15 +19,23 @@ public class Chotu {
                     " ╚════════════════════════════════════════════════════════╝\n" +
                     " Enter your choice (1-5): ";
 
-    private static String welcomeMsg = divider +
+    private static String welcomeMsg = DIVIDER +
             " >> CHOTU ACTIVATED <<\n" +
             " Namaste! I'm Chotu\n" +
             " Your wish is my command. What can I do for you?\n";
 
 
-    private static String exitMsg = divider +
+    private static String exitMsg = DIVIDER +
             "Bye-Bye. Have a good day! Jai Shree Ram!\n" +
-            divider;
+            DIVIDER;
+
+    private static String buildTaskMenuMsg() {
+        return DIVIDER
+                + "Enter the tasks you would like to add to your list.\n"
+                + "Type 'list' to list your added tasks.\n"
+                + "Type 'mark'/'unmark' [ITEM NUMBER] to mark tasks as done/not done.\n"
+                + "Type 'bye' to exit";
+    }
 
 
     public static void main(String[] args) {
@@ -80,17 +85,17 @@ public class Chotu {
 
     public static String getValidChoice(String choice) {
         while (!(isValidChoice(choice))) {
-            System.out.println(divider + "Please enter a valid choice!");
+            System.out.println(DIVIDER + "Please enter a valid choice!");
             choice = takeUserInput();
         }
         return choice;
     }
 
     public static void echo() {
-        System.out.print(divider + "Welcome to Echo mode. I'll repeat what you say!\n");
+        System.out.print(DIVIDER + "Welcome to Echo mode. I'll repeat what you say!\n");
         String userInput = takeUserInput();
         while (!(userInput.equalsIgnoreCase("bye"))) {
-            System.out.println(divider + userInput + "\n" + divider);
+            System.out.println(DIVIDER + userInput + "\n" + DIVIDER);
             userInput = takeUserInput();
         }
     }
@@ -102,20 +107,20 @@ public class Chotu {
     public static void addItem(Task task) {
         tasks[numTasks] = task;
         numTasks += 1;
-        System.out.println(divider + "added: " + task + "\n" + divider);
+        System.out.println(DIVIDER + "added: " + task + "\n" + DIVIDER);
     }
 
     public static void listTasks() {
         if (numTasks == 0) {
-            System.out.println(divider + " Your list is empty! Add some tasks first.\n" + divider);
+            System.out.println(DIVIDER + " Your list is empty! Add some tasks first.\n" + DIVIDER);
             return;
         }
 
-        System.out.println(divider + " Here are the tasks in your list:");
+        System.out.println(DIVIDER + " Here are the tasks in your list:");
         for (int i = 0; i < numTasks; i++) {
             System.out.println(" " + (i + 1) + "." + tasks[i]);
         }
-        System.out.print(divider);
+        System.out.print(DIVIDER);
     }
 
     public static boolean isValidChoice(String choice) {
@@ -127,12 +132,12 @@ public class Chotu {
 
     public static void markDone(int index) {
         tasks[index].setDone(true);
-        System.out.println(divider + "Nice! I've marked this task as done:\n" + " " + tasks[index] + "\n" + divider);
+        System.out.println(DIVIDER + "Nice! I've marked this task as done:\n" + " " + tasks[index] + "\n" + DIVIDER);
     }
 
     public static void markUndone(int index) {
         tasks[index].setDone(false);
-        System.out.println(divider + "OK, I've marked this task as not done yet:\n" + " " + tasks[index] + "\n" + divider);
+        System.out.println(DIVIDER + "OK, I've marked this task as not done yet:\n" + " " + tasks[index] + "\n" + DIVIDER);
     }
 
     public static void createToDo(String todo) {
@@ -171,9 +176,9 @@ public class Chotu {
     }
 
     private static void printAddedTask(Task task) {
-        System.out.println(divider + " Got it. I've added this task:\n" +
+        System.out.println(DIVIDER + " Got it. I've added this task:\n" +
                 "  " + task + "\n" +
                 " Now you have " + numTasks + " tasks in the list.\n" +
-                divider);
+                DIVIDER);
     }
 }
