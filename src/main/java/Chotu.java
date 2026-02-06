@@ -5,8 +5,7 @@ public class Chotu {
     final private static String divider = "\u001B[34m" + "▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓\n";
     private static Task[] tasks = new Task[100];
     private static int numTasks = 0;
-    public static boolean[] isDone = new boolean[100];
-    private static String itemsMenuMsg = divider + "Enter the tasks you would like to add to your list." +
+    private static String TaskMenuMsg = divider + "Enter the tasks you would like to add to your list." +
             "Type 'list' to list your added tasks." +
         "Type 'mark'/'unmark' [ITEM NUMBER] to mark tasks as done/not done." +
         "Type 'bye' to exit";
@@ -39,61 +38,43 @@ public class Chotu {
         System.out.print(menu);
         String choice = getValidChoice(takeUserInput());
 
-        while (!(choice).toLowerCase().equals("bye")) {
-            switch (choice) {
+        switch (choice) {
             case "1":
                 echo();
-                choice = "bye";
                 break;
-            """
-                    
-            case "2":
-
-                System.out.println(divider + "Enter the tasks you would like to add to your list.\n" +
-                        "Type 'list' to list your added tasks.\n" +
-                        "Type 'mark'/'unmark' [ITEM NUMBER] to mark tasks as done/not done.\n" +
-                        "Type 'bye' to exit\n");
-                String input = takeUserInput().toLowerCase();
-                if ((input.startsWith("list"))) {
-                    listItems();
-                } else if(input.startsWith("bye")) {
-                    choice = "bye";
-                } else if(input.startsWith("mark")) {
-                    markDone(Integer.parseInt(input.substring(5,6)) - 1);
-                } else if(input.startsWith("unmark")) {
-                    markUndone(Integer.parseInt(input.substring(7,8)) - 1);
-                }
-                else{
-                    addItem(input);
-                }
-                break;
-                """
 
             case "2":
-                System.out.println(itemsMenuMsg);
-                String input = takeUserInput();
-                String inputLowercase = input.toLowerCase();
-                if ((inputLowercase.startsWith("list"))) {
-                    listTasks();
-                } else if(inputLowercase.startsWith("bye")) {
-                    choice = "bye";
-                } else if(inputLowercase.startsWith("mark")) {
-                    markDone(Integer.parseInt(input.substring(5,6)) - 1);
-                } else if(inputLowercase.startsWith("unmark")) {
-                    markUndone(Integer.parseInt(input.substring(7,8)) - 1);
-                } else if(inputLowercase.startsWith("todo")) {
-                    addTodo(input);
-                } else if(inputLowercase.startsWith("deadline")) {
-                    addDeadline(input);
-                } else if(inputLowercase.startsWith("event")) {
-                    addEvent(input);
-                } else {
-                    System.out.println("Invalid input! Please try again.");
-                }
-
+                taskManager();
+                break;
             }
-        }
         System.out.println(exitMsg);
+        }
+
+
+    public static void taskManager() {
+        System.out.println(TaskMenuMsg);
+        String input = takeUserInput();
+        while(!input.equalsIgnoreCase("bye")) {
+            String inputLowercase = input.toLowerCase();
+            if ((inputLowercase.startsWith("list"))) {
+                listTasks();
+            } else if (inputLowercase.startsWith("bye")) {
+                break;
+            } else if (inputLowercase.startsWith("mark")) {
+                markDone(Integer.parseInt(input.substring(5).trim()) - 1);
+            } else if (inputLowercase.startsWith("unmark")) {
+                markUndone(Integer.parseInt(input.substring(7).trim()) - 1);
+            } else if (inputLowercase.startsWith("todo")) {
+                addTodo(input);
+            } else if (inputLowercase.startsWith("deadline")) {
+                addDeadline(input);
+            } else if (inputLowercase.startsWith("event")) {
+                addEvent(input);
+            } else {
+                System.out.println("Invalid input! Please try again.");
+            }
+            input = takeUserInput();
+        }
     }
 
     public static String getValidChoice(String choice) {
@@ -118,10 +99,10 @@ public class Chotu {
         return sc.nextLine();
     }
 
-    public static void addItem(String item) {
-        tasks[numTasks] = item;
+    public static void addItem(Task task) {
+        tasks[numTasks] = task;
         numTasks += 1;
-        System.out.println(divider + "added: " + item + "\n" + divider);
+        System.out.println(divider + "added: " + task + "\n" + divider);
     }
 
     public static void listTasks() {
@@ -130,14 +111,9 @@ public class Chotu {
             return;
         }
 
-        System.out.print(divider);
+        System.out.println(divider + " Here are the tasks in your list:");
         for (int i = 0; i < numTasks; i++) {
-            if (isDone[i]) {
-                System.out.println(" " + (i + 1) + ". " + "[X] " + tasks[i]);
-            } else {
-                System.out.println(" " + (i + 1) + ". " + "[ ] " + tasks[i]);
-            }
-
+            System.out.println(" " + (i + 1) + "." + tasks[i]);
         }
         System.out.print(divider);
     }
@@ -150,13 +126,13 @@ public class Chotu {
     }
 
     public static void markDone(int index) {
-        isDone[index] = true;
-        System.out.println(divider + "Nice! I've marked this task as done:\n" + " [X] " + tasks[index] + "\n" + divider);
+        tasks[index].setDone(true);
+        System.out.println(divider + "Nice! I've marked this task as done:\n" + " " + tasks[index] + "\n" + divider);
     }
 
     public static void markUndone(int index) {
-        isDone[index] = false;
-        System.out.println(divider + "OK, I've marked this task as not done yet:\n" + " [ ] " + tasks[index] + "\n" + divider);
+        tasks[index].setDone(false);
+        System.out.println(divider + "OK, I've marked this task as not done yet:\n" + " " + tasks[index] + "\n" + divider);
     }
 
     public static void createToDo(String todo) {
@@ -164,25 +140,41 @@ public class Chotu {
     }
 
     public static void addDeadline(String input) {
-        String description = input.substring(9,input.indexOf('/'));
-        String by = input.substring(input.indexOf('/')+1);
-        tasks[numTasks] = new Deadline(description, by);
+        int byIndex = input.toLowerCase().indexOf("/by");
+        String description = input.substring(9, byIndex).trim();
+        String by = input.substring(byIndex + 3).trim();
+        Task task = new Deadline(description, by);
+        tasks[numTasks] = task;
         numTasks++;
+        printAddedTask(task);
     }
 
     public static void addTodo(String input) {
-        String description = input.substring(4);
-        tasks[numTasks] = new Todo(description);
+        String description = input.substring(4).trim();
+        Task task = new Todo(description);
+        tasks[numTasks] = task;
         numTasks++;
+        printAddedTask(task);
     }
 
     public static void addEvent(String input) {
-        String description = input.substring(5, input.indexOf("/"));
-        String from = input.substring(input.indexOf("/")+6, input.lastIndexOf("/"));
-        String to = input.substring(input.lastIndexOf("/")+4);
-        tasks[numTasks] = new Event(description, from, to);
+        String inputLower = input.toLowerCase();
+        int fromIndex = inputLower.indexOf("/from");
+        int toIndex = inputLower.indexOf("/to");
+        String description = input.substring(5, fromIndex).trim();
+        String from = input.substring(fromIndex + 5, toIndex).trim();
+        String to = input.substring(toIndex + 3).trim();
+        Task task = new Event(description, from, to);
+        tasks[numTasks] = task;
         numTasks++;
+        printAddedTask(task);
+    }
+
+    private static void printAddedTask(Task task) {
+        System.out.println(divider + " Got it. I've added this task:\n" +
+                "  " + task + "\n" +
+                " Now you have " + numTasks + " tasks in the list.\n" +
+                divider);
     }
 }
-
 

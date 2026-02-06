@@ -1,5 +1,4 @@
-public class Event extends Deadline {
-    protected String description;
+public class Event extends Task {
     protected String from;
     protected String to;
 
@@ -8,18 +7,9 @@ public class Event extends Deadline {
         this.from = from;
         this.to = to;
     }
-    public String getDescription() {
-        return description;
-    }
 
     @Override
     public String toString() {
-        String checkBox;
-        if(isDone[this.taskNum]) {
-            checkBox = "[X]";
-        } else {
-            checkBox = "[ ]";
-        }
-        return ("[E]" + checkBox + " " + this.getDescription() + " (from: " + this.from + " to: " + this.to + ")");
+        return "[E]" + super.toString() + " (from: " + this.from + " to: " + this.to + ")";
     }
 }

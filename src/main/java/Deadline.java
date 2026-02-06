@@ -1,6 +1,5 @@
-public class Deadline extends Todo {
+public class Deadline extends Task {
     protected String by;
-    protected int taskNum;  //INDEX IN TASKS
     public Deadline(String description, String by) {
         super(description);
         this.by = by;
@@ -19,12 +18,6 @@ public class Deadline extends Todo {
 
     @Override
     public String toString() {
-        String checkBox;
-        if(isDone[this.taskNum]) {
-            checkBox = "[X]";
-        } else {
-            checkBox = "[ ]";
-        }
-        return "[D]" + checkBox + " " + this.getDescription() + " (by: " + this.by + ")";
+        return "[D]" + super.toString() + " (by: " + this.by + ")";
     }
 }
