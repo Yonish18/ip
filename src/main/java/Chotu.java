@@ -61,16 +61,16 @@ public class Chotu {
         System.out.println(TaskMenuMsg);
         String input = takeUserInput();
         while(!input.equalsIgnoreCase("bye")) {
-            String inputLowercase = input.toLowerCase();
+            String inputLowercase = input.toLowerCase().trim();
             try {
                 if ((inputLowercase.startsWith("list"))) {
                     listTasks();
                 } else if (inputLowercase.startsWith("bye")) {
                     break;
                 } else if (inputLowercase.startsWith("mark")) {
-                    markDone(Integer.parseInt(input.substring(5).trim()) - 1);
+                    markDone(parseTaskIndex(input, "mark"));
                 } else if (inputLowercase.startsWith("unmark")) {
-                    markUndone(Integer.parseInt(input.substring(7).trim()) - 1);
+                    markUndone(parseTaskIndex(input, "unmark"));
                 } else if (inputLowercase.startsWith("todo")) {
                     addTodo(input);
                 } else if (inputLowercase.startsWith("deadline")) {
@@ -78,10 +78,14 @@ public class Chotu {
                 } else if (inputLowercase.startsWith("event")) {
                     addEvent(input);
                 } else {
-                    System.out.println("Invalid input! Please try again.");
+                    throw new InvalidInputException("Kind sir, please enlighten me what that means. I don't understand that command.");
                 }
             } catch (InvalidInputException e) {
-                System.out.println("Sir, kindly enter a VALID input >:( ");
+                String message = e.getMessage();
+                if (message == null || message.trim().isEmpty()) {
+                    message = "Sir, kindly enter a VALID input >:( ";
+                }
+                System.out.println(DIVIDER + message + "\n" + DIVIDER);
             }
             input = takeUserInput();
         }
@@ -136,23 +140,19 @@ public class Chotu {
     }
 
     public static void markDone(int index) {
-        try {
-            tasks[index].setDone(true);
-            System.out.println(DIVIDER + "Nice! I've marked this task as done:\n" + " " + tasks[index] + "\n" + DIVIDER);
-        } catch (IndexOutOfBoundsException e) {
-            System.out.println(DIVIDER + "This task number does not exist, Sir");
-            throw new InvalidInputException();
+        if (index < 0 || index >= numTasks) {
+            throw new InvalidInputException("Sir, that task number does not exist. I cannot mark a ghost task.");
         }
+        tasks[index].setDone(true);
+        System.out.println(DIVIDER + "Nice! I've marked this task as done:\n" + " " + tasks[index] + "\n" + DIVIDER);
     }
 
     public static void markUndone(int index) {
-        try {
-            tasks[index].setDone(false);
-            System.out.println(DIVIDER + "OK, I've marked this task as not done yet:\n" + " " + tasks[index] + "\n" + DIVIDER);
-        } catch {
-            System.out.println(DIVIDER + "This task number does not exist, Sir");
-            throw new InvalidInputException();
+        if (index < 0 || index >= numTasks) {
+            throw new InvalidInputException("Sir, that task number does not exist. I cannot unmark thin air.");
         }
+        tasks[index].setDone(false);
+        System.out.println(DIVIDER + "OK, I've marked this task as not done yet:\n" + " " + tasks[index] + "\n" + DIVIDER);
     }
 
     public static void createToDo(String todo) {
@@ -160,16 +160,21 @@ public class Chotu {
     }
 
     public static void addDeadline(String input) {
-        int byIndex = input.toLowerCase().indexOf("/by");
-        String description = input.substring(9, byIndex).trim();
-        String by = input.substring(byIndex + 3).trim();
+        String rest = input.substring("deadline".length()).trim();
+        if (rest.isEmpty()) {
+            throw new InvalidInputException("Kind sir, please enlighten me how to add a deadline when you didn't even provide a description.");
+        }
+        int byIndex = rest.toLowerCase().indexOf("/by");
+        if (byIndex == -1) {
+            throw new InvalidInputException("Sir, tonight or a decade later? Please specify by what time this needs to be done.");
+        }
+        String description = rest.substring(0, byIndex).trim();
+        String by = rest.substring(byIndex + 3).trim();
 
-        if(by == null || by == "") {
-            System.out.println("Sir, tonight or a decade later? Please specify by what time this needs to be done");
-            throw new InvalidInputException();
-        } else if(description == null || description == "") {
-            System.out.println("Kind sir, please enlighten me how to add a deadline when you didn't even provide a description");
-            throw new InvalidInputException();
+        if (description.isEmpty()) {
+            throw new InvalidInputException("Kind sir, please enlighten me how to add a deadline when you didn't even provide a description.");
+        } else if (by.isEmpty()) {
+            throw new InvalidInputException("Sir, tonight or a decade later? Please specify by what time this needs to be done.");
         }
 
         Task task = new Deadline(description, by);
@@ -179,10 +184,9 @@ public class Chotu {
     }
 
     public static void addTodo(String input) {
-        String description = input.substring(4).trim();
-        if(description == "" || description == null) {
-            System.out.println("Well, sir, I can't add an empty todo now, can I? :/");
-            throw new InvalidInputException();
+        String description = input.substring("todo".length()).trim();
+        if (description.isEmpty()) {
+            throw new InvalidInputException("Well, sir, I can't add an empty todo now, can I? :/");
         }
         Task task = new Todo(description);
         tasks[numTasks] = task;
@@ -191,12 +195,26 @@ public class Chotu {
     }
 
     public static void addEvent(String input) {
-        String inputLower = input.toLowerCase();
-        int fromIndex = inputLower.indexOf("/from");
-        int toIndex = inputLower.indexOf("/to");
-        String description = input.substring(5, fromIndex).trim();
-        String from = input.substring(fromIndex + 5, toIndex).trim();
-        String to = input.substring(toIndex + 3).trim();
+        String rest = input.substring("event".length()).trim();
+        if (rest.isEmpty()) {
+            throw new InvalidInputException("Sir, are you going for dinner or pilates class? I can't add an event without a description!");
+        }
+        String restLower = rest.toLowerCase();
+        int fromIndex = restLower.indexOf("/from");
+        int toIndex = restLower.indexOf("/to");
+        if (fromIndex == -1 || toIndex == -1 || fromIndex > toIndex) {
+            throw new InvalidInputException("I cannot add this event if you don't tell me when it starts and ends.");
+        }
+        String description = rest.substring(0, fromIndex).trim();
+        String from = rest.substring(fromIndex + 5, toIndex).trim();
+        String to = rest.substring(toIndex + 3).trim();
+        if (description.isEmpty()) {
+            throw new InvalidInputException("Sir, what is the event? I can't add it without a description.");
+        } else if (from.isEmpty()) {
+            throw new InvalidInputException("I cannot add this event if you don't tell me when it starts.");
+        } else if (to.isEmpty()) {
+            throw new InvalidInputException("I cannot add this event if you don't tell me when it ends, unless you plan to stay forever.");
+        }
         Task task = new Event(description, from, to);
         tasks[numTasks] = task;
         numTasks++;
@@ -209,5 +227,16 @@ public class Chotu {
                 " Now you have " + numTasks + " tasks in the list.\n" +
                 DIVIDER);
     }
-}
 
+    private static int parseTaskIndex(String input, String command) {
+        String remainder = input.substring(command.length()).trim();
+        if (remainder.isEmpty()) {
+            throw new InvalidInputException("Sir, please include the task number, like \"" + command + " 2\".");
+        }
+        try {
+            return Integer.parseInt(remainder) - 1;
+        } catch (NumberFormatException e) {
+            throw new InvalidInputException("Sir, that task number is not valid. Try a number like 1, 2, 3.");
+        }
+    }
+}
