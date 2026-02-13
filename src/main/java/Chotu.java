@@ -17,7 +17,7 @@ public class Chotu {
                     " ║                                                        ║\n" +
                     " ║  Enter 'Bye' -> Exit                                   ║\n" +
                     " ╚════════════════════════════════════════════════════════╝\n" +
-                    " Enter your choice (1-5): ";
+                    " Enter your choice (1-2): ";
 
     private static String welcomeMsg = DIVIDER +
             " >> CHOTU ACTIVATED <<\n" +
@@ -54,32 +54,34 @@ public class Chotu {
                 break;
             }
         System.out.println(exitMsg);
-        pass;
-        pass;
         }
 
 
-    public static void taskManager() {
+    public static void taskManager() throws InvalidInputException {
         System.out.println(TaskMenuMsg);
         String input = takeUserInput();
         while(!input.equalsIgnoreCase("bye")) {
             String inputLowercase = input.toLowerCase();
-            if ((inputLowercase.startsWith("list"))) {
-                listTasks();
-            } else if (inputLowercase.startsWith("bye")) {
-                break;
-            } else if (inputLowercase.startsWith("mark")) {
-                markDone(Integer.parseInt(input.substring(5).trim()) - 1);
-            } else if (inputLowercase.startsWith("unmark")) {
-                markUndone(Integer.parseInt(input.substring(7).trim()) - 1);
-            } else if (inputLowercase.startsWith("todo")) {
-                addTodo(input);
-            } else if (inputLowercase.startsWith("deadline")) {
-                addDeadline(input);
-            } else if (inputLowercase.startsWith("event")) {
-                addEvent(input);
-            } else {
-                System.out.println("Invalid input! Please try again.");
+            try {
+                if ((inputLowercase.startsWith("list"))) {
+                    listTasks();
+                } else if (inputLowercase.startsWith("bye")) {
+                    break;
+                } else if (inputLowercase.startsWith("mark")) {
+                    markDone(Integer.parseInt(input.substring(5).trim()) - 1);
+                } else if (inputLowercase.startsWith("unmark")) {
+                    markUndone(Integer.parseInt(input.substring(7).trim()) - 1);
+                } else if (inputLowercase.startsWith("todo")) {
+                    addTodo(input);
+                } else if (inputLowercase.startsWith("deadline")) {
+                    addDeadline(input);
+                } else if (inputLowercase.startsWith("event")) {
+                    addEvent(input);
+                } else {
+                    System.out.println("Invalid input! Please try again.");
+                }
+            } catch (InvalidInputException e) {
+                System.out.println("Please try again");
             }
             input = takeUserInput();
         }
@@ -126,6 +128,7 @@ public class Chotu {
     }
 
     public static boolean isValidChoice(String choice) {
+        //This method checks whether user's choice is valid or not
         if((choice.equals("1")) || (choice.equals("2")) || (choice.equals("3")) || (choice.equalsIgnoreCase("bye"))) {
             return true;
         }
@@ -133,8 +136,13 @@ public class Chotu {
     }
 
     public static void markDone(int index) {
-        tasks[index].setDone(true);
-        System.out.println(DIVIDER + "Nice! I've marked this task as done:\n" + " " + tasks[index] + "\n" + DIVIDER);
+        try {
+            tasks[index].setDone(true);
+            System.out.println(DIVIDER + "Nice! I've marked this task as done:\n" + " " + tasks[index] + "\n" + DIVIDER);
+        } catch (IndexOutOfBoundsException e) {
+            System.out.println(DIVIDER + "This task number does not exist, Sir");
+            throw new InvalidInputException();
+        }
     }
 
     public static void markUndone(int index) {
