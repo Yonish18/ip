@@ -54,6 +54,7 @@ public class Chotu {
                 break;
             }
         System.out.println(exitMsg);
+        pass
         }
 
 
@@ -182,3 +183,4 @@ public class Chotu {
                 DIVIDER);
     }
 }
+
