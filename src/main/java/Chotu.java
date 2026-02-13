@@ -54,7 +54,8 @@ public class Chotu {
                 break;
             }
         System.out.println(exitMsg);
-        pass
+        pass;
+        pass;
         }
 
 
