@@ -81,7 +81,7 @@ public class Chotu {
                     System.out.println("Invalid input! Please try again.");
                 }
             } catch (InvalidInputException e) {
-                System.out.println("Please try again");
+                System.out.println("Sir, kindly enter a VALID input >:( ");
             }
             input = takeUserInput();
         }
@@ -116,7 +116,7 @@ public class Chotu {
 
     public static void listTasks() {
         if (numTasks == 0) {
-            System.out.println(DIVIDER + " Your list is empty! Add some tasks first.\n" + DIVIDER);
+            System.out.println(DIVIDER + " Your list is empty, congrats! You have no work. Add some tasks if you want.\n" + DIVIDER);
             return;
         }
 
@@ -146,8 +146,13 @@ public class Chotu {
     }
 
     public static void markUndone(int index) {
-        tasks[index].setDone(false);
-        System.out.println(DIVIDER + "OK, I've marked this task as not done yet:\n" + " " + tasks[index] + "\n" + DIVIDER);
+        try {
+            tasks[index].setDone(false);
+            System.out.println(DIVIDER + "OK, I've marked this task as not done yet:\n" + " " + tasks[index] + "\n" + DIVIDER);
+        } catch {
+            System.out.println(DIVIDER + "This task number does not exist, Sir");
+            throw new InvalidInputException();
+        }
     }
 
     public static void createToDo(String todo) {
@@ -158,6 +163,15 @@ public class Chotu {
         int byIndex = input.toLowerCase().indexOf("/by");
         String description = input.substring(9, byIndex).trim();
         String by = input.substring(byIndex + 3).trim();
+
+        if(by == null || by == "") {
+            System.out.println("Sir, tonight or a decade later? Please specify by what time this needs to be done");
+            throw new InvalidInputException();
+        } else if(description == null || description == "") {
+            System.out.println("Kind sir, please enlighten me how to add a deadline when you didn't even provide a description");
+            throw new InvalidInputException();
+        }
+
         Task task = new Deadline(description, by);
         tasks[numTasks] = task;
         numTasks++;
@@ -166,6 +180,10 @@ public class Chotu {
 
     public static void addTodo(String input) {
         String description = input.substring(4).trim();
+        if(description == "" || description == null) {
+            System.out.println("Well, sir, I can't add an empty todo now, can I? :/");
+            throw new InvalidInputException();
+        }
         Task task = new Todo(description);
         tasks[numTasks] = task;
         numTasks++;
