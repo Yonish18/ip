@@ -58,7 +58,7 @@ public class Chotu {
         }
 
 
-    public static void taskManager() throws InvalidInputException {
+    public static void taskManager() throws ChotuException {
         System.out.println(TaskMenuMsg);
         String input = takeUserInput();
         while(!input.equalsIgnoreCase("bye")) {
@@ -79,9 +79,9 @@ public class Chotu {
                 } else if (inputLowercase.startsWith("event")) {
                     addEvent(input);
                 } else {
-                    throw new InvalidInputException("Kind sir, please enlighten me what that means. I don't understand that command.");
+                    throw new ChotuException("Kind sir, please enlighten me what that means. I don't understand that command.");
                 }
-            } catch (InvalidInputException e) {
+            } catch (ChotuException e) {
                 String message = e.getMessage();
                 if (message == null || message.trim().isEmpty()) {
                     message = "Sir, kindly enter a VALID input >:( ";
@@ -142,7 +142,7 @@ public class Chotu {
 
     public static void markDone(int index) {
         if (index < 0 || index >= numTasks) {
-            throw new InvalidInputException("Sir, that task number does not exist. I cannot mark a ghost task.");
+            throw new ChotuException("Sir, that task number does not exist. I cannot mark a ghost task.");
         }
         tasks[index].setDone(true);
         System.out.println(DIVIDER + "Nice! I've marked this task as done:\n" + " " + tasks[index] + "\n" + DIVIDER);
@@ -150,7 +150,7 @@ public class Chotu {
 
     public static void markUndone(int index) {
         if (index < 0 || index >= numTasks) {
-            throw new InvalidInputException("Sir, that task number does not exist. I cannot unmark thin air.");
+            throw new ChotuException("Sir, that task number does not exist. I cannot unmark thin air.");
         }
         tasks[index].setDone(false);
         System.out.println(DIVIDER + "OK, I've marked this task as not done yet:\n" + " " + tasks[index] + "\n" + DIVIDER);
@@ -163,19 +163,19 @@ public class Chotu {
     public static void addDeadline(String input) {
         String rest = input.substring("deadline".length()).trim();
         if (rest.isEmpty()) {
-            throw new InvalidInputException("Kind sir, please enlighten me how to add a deadline when you didn't even provide a description.");
+            throw new ChotuException("Kind sir, please enlighten me how to add a deadline when you didn't even provide a description.");
         }
         int byIndex = rest.toLowerCase().indexOf("/by");
         if (byIndex == -1) {
-            throw new InvalidInputException("Sir, tonight or a decade later? Please specify by what time this needs to be done.");
+            throw new ChotuException("Sir, tonight or a decade later? Please specify by what time this needs to be done.");
         }
         String description = rest.substring(0, byIndex).trim();
         String by = rest.substring(byIndex + 3).trim();
 
         if (description.isEmpty()) {
-            throw new InvalidInputException("Kind sir, please enlighten me how to add a deadline when you didn't even provide a description.");
+            throw new ChotuException("Kind sir, please enlighten me how to add a deadline when you didn't even provide a description.");
         } else if (by.isEmpty()) {
-            throw new InvalidInputException("Sir, tonight or a decade later? Please specify by what time this needs to be done.");
+            throw new ChotuException("Sir, tonight or a decade later? Please specify by what time this needs to be done.");
         }
 
         Task task = new Deadline(description, by);
@@ -187,7 +187,7 @@ public class Chotu {
     public static void addTodo(String input) {
         String description = input.substring("todo".length()).trim();
         if (description.isEmpty()) {
-            throw new InvalidInputException("Well, sir, I can't add an empty todo now, can I? :/");
+            throw new ChotuException("Well, sir, I can't add an empty todo now, can I? :/");
         }
         Task task = new Todo(description);
         tasks[numTasks] = task;
@@ -198,23 +198,23 @@ public class Chotu {
     public static void addEvent(String input) {
         String rest = input.substring("event".length()).trim();
         if (rest.isEmpty()) {
-            throw new InvalidInputException("Sir, are you going for dinner or pilates class? I can't add an event without a description!");
+            throw new ChotuException("Sir, are you going for dinner or pilates class? I can't add an event without a description!");
         }
         String restLower = rest.toLowerCase();
         int fromIndex = restLower.indexOf("/from");
         int toIndex = restLower.indexOf("/to");
         if (fromIndex == -1 || toIndex == -1 || fromIndex > toIndex) {
-            throw new InvalidInputException("I cannot add this event if you don't tell me when it starts and ends.");
+            throw new ChotuException("I cannot add this event if you don't tell me when it starts and ends.");
         }
         String description = rest.substring(0, fromIndex).trim();
         String from = rest.substring(fromIndex + 5, toIndex).trim();
         String to = rest.substring(toIndex + 3).trim();
         if (description.isEmpty()) {
-            throw new InvalidInputException("Sir, what is the event? I can't add it without a description.");
+            throw new ChotuException("Sir, what is the event? I can't add it without a description.");
         } else if (from.isEmpty()) {
-            throw new InvalidInputException("I cannot add this event if you don't tell me when it starts.");
+            throw new ChotuException("I cannot add this event if you don't tell me when it starts.");
         } else if (to.isEmpty()) {
-            throw new InvalidInputException("I cannot add this event if you don't tell me when it ends, unless you plan to stay forever.");
+            throw new ChotuException("I cannot add this event if you don't tell me when it ends, unless you plan to stay forever.");
         }
         Task task = new Event(description, from, to);
         tasks[numTasks] = task;
@@ -232,12 +232,12 @@ public class Chotu {
     private static int parseTaskIndex(String input, String command) {
         String remainder = input.substring(command.length()).trim();
         if (remainder.isEmpty()) {
-            throw new InvalidInputException("Sir, please include the task number, like \"" + command + " 2\".");
+            throw new ChotuException("Sir, please include the task number, like \"" + command + " 2\".");
         }
         try {
             return Integer.parseInt(remainder) - 1;
         } catch (NumberFormatException e) {
-            throw new InvalidInputException("Sir, that task number is not valid. Try a number like 1, 2, 3.");
+            throw new ChotuException("Sir, that task number is not valid. Try a number like 1, 2, 3.");
         }
     }
 }
