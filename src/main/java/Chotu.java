@@ -1,16 +1,10 @@
 import java.util.ArrayList;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.List;
 
 public class Chotu {
 
     private static final Ui ui = new Ui();
+    private static final Storage storage = new Storage("data/Chotu.txt");
     private static ArrayList<Task> tasks = new ArrayList<>();
-    private static final Path DATA_DIR = Paths.get("data");
-    private static final Path DATA_FILE = DATA_DIR.resolve("Chotu.txt");
     private static String TaskMenuMsg = buildTaskMenuMsg();
     private static String menu =
             " ╔════════════════════════════════════════════════════════╗\n" +
@@ -49,7 +43,7 @@ public class Chotu {
 
     public static void main(String[] args) {
 
-        loadTasksFromDisk();
+        storage.loadTasks(tasks, ui);
         ui.show(welcomeMsg);
         ui.show(menu);
         String choice = getValidChoice(takeUserInput());
@@ -128,7 +122,7 @@ public class Chotu {
     public static void addItem(Task task) {
         tasks.add(task);
         ui.show(Ui.DIVIDER + "added: " + task + "\n" + Ui.DIVIDER);
-        saveTasksToDisk();
+        storage.saveTasks(tasks, ui);
     }
 
     public static void listTasks() {
@@ -155,13 +149,13 @@ public class Chotu {
     public static void markDone(int index) {
         tasks.get(index).setDone(true);
         ui.show(Ui.DIVIDER + "Nice! I've marked this task as done:\n" + " " + tasks.get(index) + "\n" + Ui.DIVIDER);
-        saveTasksToDisk();
+        storage.saveTasks(tasks, ui);
     }
 
     public static void markUndone(int index) {
         tasks.get(index).setDone(false);
         ui.show(Ui.DIVIDER + "OK, I've marked this task as not done yet:\n" + " " + tasks.get(index) + "\n" + Ui.DIVIDER);
-        saveTasksToDisk();
+        storage.saveTasks(tasks, ui);
     }
 
     public static void addDeadline(String input) {
@@ -185,7 +179,7 @@ public class Chotu {
         Task task = new Deadline(description, by);
         tasks.add(task);
         printAddedTask(task);
-        saveTasksToDisk();
+        storage.saveTasks(tasks, ui);
     }
 
     public static void addTodo(String input) {
@@ -196,7 +190,7 @@ public class Chotu {
         Task task = new Todo(description);
         tasks.add(task);
         printAddedTask(task);
-        saveTasksToDisk();
+        storage.saveTasks(tasks, ui);
     }
 
     public static void addEvent(String input) {
@@ -223,7 +217,7 @@ public class Chotu {
         Task task = new Event(description, from, to);
         tasks.add(task);
         printAddedTask(task);
-        saveTasksToDisk();
+        storage.saveTasks(tasks, ui);
     }
 
     private static void printAddedTask(Task task) {
@@ -256,109 +250,8 @@ public class Chotu {
     public static void deleteTask(int index) {
         Task task = tasks.get(index);
         tasks.remove(index);
-        saveTasksToDisk();
+        storage.saveTasks(tasks, ui);
         System.out.println("OK, I have deleted *" + task + "* from your list");
         listTasks();
-    }
-
-    private static void loadTasksFromDisk() {
-        if (!Files.exists(DATA_FILE)) {
-            return;
-        }
-        int skipped = 0;
-        try {
-            List<String> lines = Files.readAllLines(DATA_FILE);
-            for (String line : lines) {
-                if (line == null) {
-                    continue;
-                }
-                String trimmed = line.trim();
-                if (trimmed.isEmpty()) {
-                    continue;
-                }
-                String[] parts = trimmed.split("\\s*\\|\\s*");
-                if (parts.length < 3) {
-                    skipped++;
-                    continue;
-                }
-                String type = parts[0];
-                String doneFlag = parts[1];
-                String description = parts[2];
-                if (description.isEmpty()) {
-                    skipped++;
-                    continue;
-                }
-
-                Task task;
-                if (type.equals("T")) {
-                    task = new Todo(description);
-                } else if (type.equals("D")) {
-                    if (parts.length < 4) {
-                        skipped++;
-                        continue;
-                    }
-                    task = new Deadline(description, parts[3]);
-                } else if (type.equals("E")) {
-                    if (parts.length < 5) {
-                        skipped++;
-                        continue;
-                    }
-                    task = new Event(description, parts[3], parts[4]);
-                } else {
-                    skipped++;
-                    continue;
-                }
-
-                if (doneFlag.equals("1")) {
-                    task.setDone(true);
-                } else if (doneFlag.equals("0")) {
-                    task.setDone(false);
-                } else {
-                    skipped++;
-                    continue;
-                }
-
-                tasks.add(task);
-            }
-        } catch (IOException e) {
-            ui.show(Ui.DIVIDER + "Warning: I couldn't read saved tasks.\n" + Ui.DIVIDER);
-            return;
-        }
-
-        if (skipped > 0) {
-            ui.show(Ui.DIVIDER + "Warning: I skipped " + skipped + " corrupted task line(s) in saved data.\n" + Ui.DIVIDER);
-        }
-    }
-
-    
-    private static void saveTasksToDisk() {
-        try {
-            Files.createDirectories(DATA_DIR);
-            StringBuilder content = new StringBuilder();
-            for (int i = 0; i < tasks.size(); i++) {
-                Task task = tasks.get(i);
-                content.append(serializeTask(task));
-                if (i < tasks.size() - 1) {
-                    content.append(System.lineSeparator());
-                }
-            }
-            Files.write(DATA_FILE, content.toString().getBytes());
-        } catch (IOException e) {
-            ui.show(Ui.DIVIDER + "Warning: I couldn't save your tasks.\n" + Ui.DIVIDER);
-        }
-    }
-
-    private static String serializeTask(Task task) {
-        String doneFlag = task.isDone() ? "1" : "0";
-        if (task instanceof Todo) {
-            return "T | " + doneFlag + " | " + task.getDescription();
-        } else if (task instanceof Deadline) {
-            Deadline deadline = (Deadline) task;
-            return "D | " + doneFlag + " | " + deadline.getDescription() + " | " + deadline.getBy();
-        } else if (task instanceof Event) {
-            Event event = (Event) task;
-            return "E | " + doneFlag + " | " + event.getDescription() + " | " + event.from + " | " + event.to;
-        }
-        return "T | " + doneFlag + " | " + task.getDescription();
     }
 }
