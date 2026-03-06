@@ -51,6 +51,17 @@ public class TaskList {
         }
     }
 
+    public ArrayList<Task> findByKeyword(String keyword) {
+        ArrayList<Task> matches = new ArrayList<>();
+        String keywordLower = keyword.toLowerCase();
+        for (Task task : tasks) {
+            if (task.getDescription().toLowerCase().contains(keywordLower)) {
+                matches.add(task);
+            }
+        }
+        return matches;
+    }
+
     public ArrayList<Task> asList() {
         return tasks;
     }

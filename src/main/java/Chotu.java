@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 public class Chotu {
 
     private static final Ui ui = new Ui();
@@ -35,7 +37,8 @@ public class Chotu {
                 + "Type 'todo [DESCRIPTION]' to add a todo task."
                 + "Type 'event [DESCRIPTION] /from [START_DETAILS] /to [END_DETAILS]' to add an event.\n"
                 + "Type 'deadline [DESCRIPTION] /by [DEADLINE]' to add a deadline.\n"
-                + "Type 'delete [TASK NUMBER]' to delete a task from your list"
+                + "Type 'delete [TASK NUMBER]' to delete a task from your list.\n"
+                + "Type 'find [KEYWORD]' to find matching tasks.\n"
                 + "Type 'bye' to exit";
     }
 
@@ -84,6 +87,8 @@ public class Chotu {
                     addEvent(input);
                 } else if (commandWord.equals("delete")) {
                     deleteTask(tasks.parseTaskIndex(input, "delete"));
+                } else if (commandWord.equals("find")) {
+                    findTasks(input);
                 } else {
                     throw new ChotuException("Kind sir, please enlighten me what that means. I don't understand that command.");
                 }
@@ -232,5 +237,24 @@ public class Chotu {
         storage.saveTasks(tasks.asList(), ui);
         System.out.println("OK, I have deleted *" + task + "* from your list");
         listTasks();
+    }
+
+    public static void findTasks(String input) {
+        String keyword = input.substring("find".length()).trim();
+        if (keyword.isEmpty()) {
+            throw new ChotuException("Sir, please include a keyword. Example: find book");
+        }
+
+        ArrayList<Task> matches = tasks.findByKeyword(keyword);
+        if (matches.isEmpty()) {
+            ui.show(Ui.DIVIDER + "I couldn't find matching tasks.\n" + Ui.DIVIDER);
+            return;
+        }
+
+        ui.show(Ui.DIVIDER + "Here are the matching tasks in your list:\n");
+        for (int i = 0; i < matches.size(); i++) {
+            ui.show(" " + (i + 1) + "." + matches.get(i) + "\n");
+        }
+        ui.show(Ui.DIVIDER);
     }
 }
