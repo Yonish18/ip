@@ -105,7 +105,7 @@ public class Storage {
             return "T | " + doneFlag + " | " + task.getDescription();
         } else if (task instanceof Deadline) {
             Deadline deadline = (Deadline) task;
-            return "D | " + doneFlag + " | " + deadline.getDescription() + " | " + deadline.getBy();
+            return "D | " + doneFlag + " | " + deadline.getDescription() + " | " + deadline.getByForStorage();
         } else if (task instanceof Event) {
             Event event = (Event) task;
             return "E | " + doneFlag + " | " + event.getDescription() + " | " + event.from + " | " + event.to;
