@@ -1,11 +1,11 @@
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Chotu {
 
     private static final String DIVIDER = "▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓\n";
     private static final Scanner SCANNER = new Scanner(System.in);
-    private static Task[] tasks = new Task[100];
-    private static int numTasks = 0;
+    private static ArrayList<Task> tasks = new ArrayList<>();
     private static String TaskMenuMsg = buildTaskMenuMsg();
     private static String menu =
             " ╔════════════════════════════════════════════════════════╗\n" +
@@ -31,9 +31,13 @@ public class Chotu {
 
     private static String buildTaskMenuMsg() {
         return DIVIDER
-                + "Enter the tasks you would like to add to your list.\n"
+                + "TASK MANAGER MENU\n\n"
                 + "Type 'list' to list your added tasks.\n"
-                + "Type 'mark'/'unmark' [ITEM NUMBER] to mark tasks as done/not done.\n"
+                + "Type 'mark'/'unmark' [TASK NUMBER] to mark tasks as done/not done.\n"
+                + "Type 'todo [DESCRIPTION]' to add a todo task."
+                + "Type 'event [DESCRIPTION] /from [START_DETAILS] /to [END_DETAILS]' to add an event.\n"
+                + "Type 'deadline [DESCRIPTION] /by [DEADLINE]' to add a deadline.\n"
+                + "Type 'delete [TASK NUMBER]' to delete a task from your list"
                 + "Type 'bye' to exit";
     }
 
@@ -55,7 +59,6 @@ public class Chotu {
             }
         System.out.println(exitMsg);
         //use this to test branching
-        //use this to test branching for main
         }
 
 
@@ -79,6 +82,8 @@ public class Chotu {
                     addDeadline(input);
                 } else if (inputLowercase.startsWith("event")) {
                     addEvent(input);
+                } else if (inputLowercase.startsWith("delete")) {
+                    deleteTask(parseTaskIndex(input, "delete"));
                 } else {
                     throw new ChotuException("Kind sir, please enlighten me what that means. I don't understand that command.");
                 }
@@ -115,20 +120,19 @@ public class Chotu {
     }
 
     public static void addItem(Task task) {
-        tasks[numTasks] = task;
-        numTasks += 1;
+        tasks.add(task);
         System.out.println(DIVIDER + "added: " + task + "\n" + DIVIDER);
     }
 
     public static void listTasks() {
-        if (numTasks == 0) {
+        if (tasks.size() == 0) {
             System.out.println(DIVIDER + " Your list is empty, congrats! You have no work. Add some tasks if you want.\n" + DIVIDER);
             return;
         }
 
         System.out.println(DIVIDER + " Here are the tasks in your list:");
-        for (int i = 0; i < numTasks; i++) {
-            System.out.println(" " + (i + 1) + "." + tasks[i]);
+        for (int i = 0; i < tasks.size(); i++) {
+            System.out.println(" " + (i + 1) + "." + tasks.get(i));
         }
         System.out.print(DIVIDER);
     }
@@ -142,23 +146,13 @@ public class Chotu {
     }
 
     public static void markDone(int index) {
-        if (index < 0 || index >= numTasks) {
-            throw new ChotuException("Sir, that task number does not exist. I cannot mark a ghost task.");
-        }
-        tasks[index].setDone(true);
-        System.out.println(DIVIDER + "Nice! I've marked this task as done:\n" + " " + tasks[index] + "\n" + DIVIDER);
+        tasks.get(index).setDone(true);
+        System.out.println(DIVIDER + "Nice! I've marked this task as done:\n" + " " + tasks.get(index) + "\n" + DIVIDER);
     }
 
     public static void markUndone(int index) {
-        if (index < 0 || index >= numTasks) {
-            throw new ChotuException("Sir, that task number does not exist. I cannot unmark thin air.");
-        }
-        tasks[index].setDone(false);
-        System.out.println(DIVIDER + "OK, I've marked this task as not done yet:\n" + " " + tasks[index] + "\n" + DIVIDER);
-    }
-
-    public static void createToDo(String todo) {
-
+        tasks.get(index).setDone(false);
+        System.out.println(DIVIDER + "OK, I've marked this task as not done yet:\n" + " " + tasks.get(index) + "\n" + DIVIDER);
     }
 
     public static void addDeadline(String input) {
@@ -180,19 +174,17 @@ public class Chotu {
         }
 
         Task task = new Deadline(description, by);
-        tasks[numTasks] = task;
-        numTasks++;
+        tasks.add(task);
         printAddedTask(task);
     }
 
     public static void addTodo(String input) {
-        String description = input.substring("todo".length()).trim();
+        String description = input.substring("todo".length()).trim(); //avoiding magic literals here
         if (description.isEmpty()) {
             throw new ChotuException("Well, sir, I can't add an empty todo now, can I? :/");
         }
         Task task = new Todo(description);
-        tasks[numTasks] = task;
-        numTasks++;
+        tasks.add(task);
         printAddedTask(task);
     }
 
@@ -218,27 +210,41 @@ public class Chotu {
             throw new ChotuException("I cannot add this event if you don't tell me when it ends, unless you plan to stay forever.");
         }
         Task task = new Event(description, from, to);
-        tasks[numTasks] = task;
-        numTasks++;
+        tasks.add(task);
         printAddedTask(task);
     }
 
     private static void printAddedTask(Task task) {
         System.out.println(DIVIDER + " Got it. I've added this task:\n" +
                 "  " + task + "\n" +
-                " Now you have " + numTasks + " tasks in the list.\n" +
+                " Now you have " + tasks.size() + " tasks in the list.\n" +
                 DIVIDER);
     }
 
     private static int parseTaskIndex(String input, String command) {
+        /**
+         * Parses a task index from user input.
+         * Strips the command word, converts the remaining number to a 0-based index.
+         */
         String remainder = input.substring(command.length()).trim();
         if (remainder.isEmpty()) {
             throw new ChotuException("Sir, please include the task number, like \"" + command + " 2\".");
         }
         try {
-            return Integer.parseInt(remainder) - 1;
+            int index = Integer.parseInt(remainder) - 1;
+            if (index < 0 || index >= tasks.size()) {
+                throw new ChotuException("Sir, that task number doesn't exist. Must be a ghost task. You have " + tasks.size() + " tasks.");
+            }
+            return index;
         } catch (NumberFormatException e) {
             throw new ChotuException("Sir, that task number is not valid. Try a number like 1, 2, 3.");
         }
+    }
+
+    public static void deleteTask(int index) {
+        Task task = tasks.get(index);
+        tasks.remove(index);
+        System.out.println("OK, I have deleted *" + task + "* from your list");
+        listTasks();
     }
 }
