@@ -12,7 +12,7 @@ public class Parser {
     }
 
     public String parseFindKeyword(String input) {
-        String keyword = input.substring("find".length()).trim();
+        String keyword = input.substring("find".length()).trim().toLowerCase();
         if (keyword.isEmpty()) {
             throw new ChotuException("Sir, please include a keyword. Example: find book");
         }
