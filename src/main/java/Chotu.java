@@ -1,11 +1,12 @@
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Chotu {
 
     private static final String DIVIDER = "▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓\n";
     private static final Scanner SCANNER = new Scanner(System.in);
-    private static Task[] tasks = new Task[100];
-    private static int numTasks = 0;
+    private static ArrayList<Task> tasks = new ArrayList<>();
+    //private static int numTasks = 0; ( use arraylist.size() )
     private static String TaskMenuMsg = buildTaskMenuMsg();
     private static String menu =
             " ╔════════════════════════════════════════════════════════╗\n" +
@@ -52,15 +53,14 @@ public class Chotu {
                 break;
 
             case "2":
-                taskManager();
+                manageTasks();
                 break;
             }
         System.out.println(exitMsg);
-        //use this to test branching
         }
 
 
-    public static void taskManager() throws ChotuException {
+    public static void manageTasks() throws ChotuException {
         System.out.println(TaskMenuMsg);
         String input = takeUserInput();
         while(!input.equalsIgnoreCase("bye")) {
@@ -116,20 +116,20 @@ public class Chotu {
     }
 
     public static void addItem(Task task) {
-        tasks[numTasks] = task;
-        numTasks += 1;
+        tasks.add(task);
+        //numTasks += 1;
         System.out.println(DIVIDER + "added: " + task + "\n" + DIVIDER);
     }
 
     public static void listTasks() {
-        if (numTasks == 0) {
+        if (tasks.size() == 0) {
             System.out.println(DIVIDER + " Your list is empty, congrats! You have no work. Add some tasks if you want.\n" + DIVIDER);
             return;
         }
 
         System.out.println(DIVIDER + " Here are the tasks in your list:");
-        for (int i = 0; i < numTasks; i++) {
-            System.out.println(" " + (i + 1) + "." + tasks[i]);
+        for (int i = 0; i < tasks.size(); i++) {
+            System.out.println(" " + (i + 1) + "." + tasks.get(i));
         }
         System.out.print(DIVIDER);
     }
@@ -143,19 +143,19 @@ public class Chotu {
     }
 
     public static void markDone(int index) {
-        if (index < 0 || index >= numTasks) {
+        if (index < 0 || index >= tasks.size()) {
             throw new ChotuException("Sir, that task number does not exist. I cannot mark a ghost task.");
         }
-        tasks[index].setDone(true);
-        System.out.println(DIVIDER + "Nice! I've marked this task as done:\n" + " " + tasks[index] + "\n" + DIVIDER);
+        tasks.get(index).setDone(true);
+        System.out.println(DIVIDER + "Nice! I've marked this task as done:\n" + " " + tasks.get(index) + "\n" + DIVIDER);
     }
 
     public static void markUndone(int index) {
-        if (index < 0 || index >= numTasks) {
+        if (index < 0 || index >= tasks.size()) {
             throw new ChotuException("Sir, that task number does not exist. I cannot unmark thin air.");
         }
-        tasks[index].setDone(false);
-        System.out.println(DIVIDER + "OK, I've marked this task as not done yet:\n" + " " + tasks[index] + "\n" + DIVIDER);
+        tasks.get(index).setDone(false);
+        System.out.println(DIVIDER + "OK, I've marked this task as not done yet:\n" + " " + tasks.get(index) + "\n" + DIVIDER);
     }
 
     public static void createToDo(String todo) {
@@ -181,19 +181,19 @@ public class Chotu {
         }
 
         Task task = new Deadline(description, by);
-        tasks[numTasks] = task;
-        numTasks++;
+        tasks.add(task);
+        //numTasks++;
         printAddedTask(task);
     }
 
     public static void addTodo(String input) {
-        String description = input.substring("todo".length()).trim();
+        String description = input.substring("todo".length()).trim(); //avoiding magic literals here
         if (description.isEmpty()) {
             throw new ChotuException("Well, sir, I can't add an empty todo now, can I? :/");
         }
         Task task = new Todo(description);
-        tasks[numTasks] = task;
-        numTasks++;
+        tasks.add(task);
+        //numTasks++;
         printAddedTask(task);
     }
 
@@ -219,15 +219,15 @@ public class Chotu {
             throw new ChotuException("I cannot add this event if you don't tell me when it ends, unless you plan to stay forever.");
         }
         Task task = new Event(description, from, to);
-        tasks[numTasks] = task;
-        numTasks++;
+        tasks.add(task);
+        //numTasks++;
         printAddedTask(task);
     }
 
     private static void printAddedTask(Task task) {
         System.out.println(DIVIDER + " Got it. I've added this task:\n" +
                 "  " + task + "\n" +
-                " Now you have " + numTasks + " tasks in the list.\n" +
+                " Now you have " + tasks.size() + " tasks in the list.\n" +
                 DIVIDER);
     }
 
