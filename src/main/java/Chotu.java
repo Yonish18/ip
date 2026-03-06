@@ -1,5 +1,8 @@
 import java.util.ArrayList;
 
+/**
+ * Main class of the Chotu chatbot application.
+ */
 public class Chotu {
 
     private static final Ui ui = new Ui();
@@ -29,6 +32,11 @@ public class Chotu {
             "Bye-Bye. Have a good day! Jai Shree Ram!\n" +
             Ui.DIVIDER;
 
+    /**
+     * Builds the task manager menu text.
+     *
+     * @return task menu message
+     */
     private static String buildTaskMenuMsg() {
         return Ui.DIVIDER
                 + "TASK MANAGER MENU\n\n"
@@ -43,6 +51,11 @@ public class Chotu {
     }
 
 
+    /**
+     * Starts the chatbot program.
+     *
+     * @param args command line arguments
+     */
     public static void main(String[] args) {
 
         storage.loadTasks(tasks.asList(), ui);
@@ -66,6 +79,11 @@ public class Chotu {
         }
 
 
+    /**
+     * Runs the task manager command loop (until user says bye).
+     *
+     * @throws ChotuException if a command is invalid
+     */
     public static void taskManager() throws ChotuException {
         ui.show(TaskMenuMsg + "\n");
         String input = takeUserInput();
@@ -104,6 +122,12 @@ public class Chotu {
         }
     }
 
+    /**
+     * Re-prompts until a valid main-menu choice is entered.
+     *
+     * @param choice initial user choice
+     * @return valid choice after re-checking
+     */
     public static String getValidChoice(String choice) {
         while (!(isValidChoice(choice))) {
             ui.show(Ui.DIVIDER + "Please enter a valid choice!\n");
@@ -112,6 +136,9 @@ public class Chotu {
         return choice;
     }
 
+    /**
+     * Runs echo mode until the user enters bye.
+     */
     public static void echo() {
         ui.show(Ui.DIVIDER + "Welcome to Echo mode. I'll repeat what you say!\n");
         String userInput = takeUserInput();
@@ -121,16 +148,30 @@ public class Chotu {
         }
     }
 
+    /**
+     * Reads one line of user input.
+     *
+     * @return user input text
+     */
     public static String takeUserInput() {
         return ui.readCommand();
     }
 
+    /**
+     * Adds a task and saves the task list.
+     *
+     * @param task task to add
+     */
     public static void addItem(Task task) {
         tasks.add(task);
         ui.show(Ui.DIVIDER + "added: " + task + "\n" + Ui.DIVIDER);
         storage.saveTasks(tasks.asList(), ui);
     }
 
+    /**
+     * Prints all tasks in the list.
+     * If there are no tasks, it prints an empty-list message instead.
+     */
     public static void listTasks() {
         if (tasks.isEmpty()) {
             ui.show(Ui.DIVIDER + " Your list is empty, congrats! You have no work. Add some tasks if you want.\n" + Ui.DIVIDER);
@@ -144,26 +185,46 @@ public class Chotu {
         ui.show(Ui.DIVIDER);
     }
 
+    /**
+     * Checks if a main-menu choice is valid.
+     *
+     * @param choice menu choice
+     * @return true if valid
+     */
     public static boolean isValidChoice(String choice) {
-        //This method checks whether user's choice is valid or not
         if((choice.equals("1")) || (choice.equals("2")) || (choice.equals("3")) || (choice.equalsIgnoreCase("bye"))) {
             return true;
         }
         return false;
     }
 
+    /**
+     * Marks the task at the given index as done.
+     *
+     * @param index zero-based task index
+     */
     public static void markDone(int index) {
         tasks.markDone(index);
         ui.show(Ui.DIVIDER + "Nice! I've marked this task as done:\n" + " " + tasks.get(index) + "\n" + Ui.DIVIDER);
         storage.saveTasks(tasks.asList(), ui);
     }
 
+    /**
+     * Marks the task at the given index as not done.
+     *
+     * @param index zero-based task index
+     */
     public static void markUndone(int index) {
         tasks.markUndone(index);
         ui.show(Ui.DIVIDER + "OK, I've marked this task as not done yet:\n" + " " + tasks.get(index) + "\n" + Ui.DIVIDER);
         storage.saveTasks(tasks.asList(), ui);
     }
 
+    /**
+     * Parses and adds a deadline task from user input.
+     *
+     * @param input full deadline command
+     */
     public static void addDeadline(String input) {
         String rest = input.substring("deadline".length()).trim();
         if (rest.isEmpty()) {
@@ -188,6 +249,11 @@ public class Chotu {
         storage.saveTasks(tasks.asList(), ui);
     }
 
+    /**
+     * Parses and adds a todo task from user input.
+     *
+     * @param input full todo command
+     */
     public static void addTodo(String input) {
         String description = input.substring("todo".length()).trim(); //avoiding magic literals here
         if (description.isEmpty()) {
@@ -199,6 +265,11 @@ public class Chotu {
         storage.saveTasks(tasks.asList(), ui);
     }
 
+    /**
+     * Parses and adds an event task from user input.
+     *
+     * @param input full event command
+     */
     public static void addEvent(String input) {
         String rest = input.substring("event".length()).trim();
         if (rest.isEmpty()) {
@@ -226,6 +297,11 @@ public class Chotu {
         storage.saveTasks(tasks.asList(), ui);
     }
 
+    /**
+     * Prints a confirmation after a task is added.
+     *
+     * @param task added task
+     */
     private static void printAddedTask(Task task) {
         ui.show(Ui.DIVIDER + " Got it. I've added this task:\n" +
                 "  " + task + "\n" +
@@ -233,6 +309,11 @@ public class Chotu {
                 Ui.DIVIDER);
     }
 
+    /**
+     * Deletes a task and saves the task list.
+     *
+     * @param index zero-based task index
+     */
     public static void deleteTask(int index) {
         Task task = tasks.remove(index);
         storage.saveTasks(tasks.asList(), ui);
@@ -240,6 +321,11 @@ public class Chotu {
         listTasks();
     }
 
+    /**
+     * Finds tasks that contain the given keyword and shows them.
+     *
+     * @param input full find command
+     */
     public static void findTasks(String input) {
         String keyword = parser.parseFindKeyword(input);
         ArrayList<Task> matches = tasks.findByKeyword(keyword);

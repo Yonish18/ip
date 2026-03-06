@@ -4,16 +4,31 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 
+/**
+ * Handles loading tasks from disk and saving tasks to disk.
+ */
 public class Storage {
     private final Path dataDir;
     private final Path dataFile;
 
+    /**
+     * Creates a storage object for the given file path.
+     *
+     * @param filePath path to the data file
+     */
     public Storage(String filePath) {
         this.dataFile = Paths.get(filePath);
         Path parent = this.dataFile.getParent();
         this.dataDir = parent == null ? Paths.get(".") : parent;
     }
 
+    /**
+     * Loads tasks from the file into the given task list.
+     * Invalid lines are skipped.
+     *
+     * @param tasks target task list
+     * @param ui UI used to show warning messsages
+     */
     public void loadTasks(ArrayList<Task> tasks, Ui ui) {
         if (!Files.exists(dataFile)) {
             return;
@@ -87,6 +102,12 @@ public class Storage {
         }
     }
 
+    /**
+     * Saves all tasks to the data file.
+     *
+     * @param tasks tasks to save
+     * @param ui UI used to show warnings if saving fails
+     */
     public void saveTasks(ArrayList<Task> tasks, Ui ui) {
         try {
             Files.createDirectories(dataDir);
@@ -104,6 +125,12 @@ public class Storage {
         }
     }
 
+    /**
+     * Converts one task to a single line for file storage.
+     *
+     * @param task task to serialize
+     * @return storage line
+     */
     private String serializeTask(Task task) {
         String doneFlag = task.isDone() ? "1" : "0";
         if (task instanceof Todo) {
