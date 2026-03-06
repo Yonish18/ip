@@ -1,3 +1,8 @@
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
 import java.util.Scanner;
 
 public class Chotu {
@@ -6,6 +11,8 @@ public class Chotu {
     private static final Scanner SCANNER = new Scanner(System.in);
     private static Task[] tasks = new Task[100];
     private static int numTasks = 0;
+    private static final Path DATA_DIR = Paths.get("data");
+    private static final Path DATA_FILE = DATA_DIR.resolve("Chotu.txt");
     private static String TaskMenuMsg = buildTaskMenuMsg();
     private static String menu =
             " ╔════════════════════════════════════════════════════════╗\n" +
@@ -40,6 +47,7 @@ public class Chotu {
 
     public static void main(String[] args) {
 
+        loadTasksFromDisk();
         System.out.println(welcomeMsg);
         System.out.print(menu);
         String choice = getValidChoice(takeUserInput());
@@ -117,6 +125,7 @@ public class Chotu {
         tasks[numTasks] = task;
         numTasks += 1;
         System.out.println(DIVIDER + "added: " + task + "\n" + DIVIDER);
+        saveTasksToDisk();
     }
 
     public static void listTasks() {
@@ -146,6 +155,7 @@ public class Chotu {
         }
         tasks[index].setDone(true);
         System.out.println(DIVIDER + "Nice! I've marked this task as done:\n" + " " + tasks[index] + "\n" + DIVIDER);
+        saveTasksToDisk();
     }
 
     public static void markUndone(int index) {
@@ -154,6 +164,7 @@ public class Chotu {
         }
         tasks[index].setDone(false);
         System.out.println(DIVIDER + "OK, I've marked this task as not done yet:\n" + " " + tasks[index] + "\n" + DIVIDER);
+        saveTasksToDisk();
     }
 
     public static void createToDo(String todo) {
@@ -182,6 +193,7 @@ public class Chotu {
         tasks[numTasks] = task;
         numTasks++;
         printAddedTask(task);
+        saveTasksToDisk();
     }
 
     public static void addTodo(String input) {
@@ -193,6 +205,7 @@ public class Chotu {
         tasks[numTasks] = task;
         numTasks++;
         printAddedTask(task);
+        saveTasksToDisk();
     }
 
     public static void addEvent(String input) {
@@ -220,6 +233,7 @@ public class Chotu {
         tasks[numTasks] = task;
         numTasks++;
         printAddedTask(task);
+        saveTasksToDisk();
     }
 
     private static void printAddedTask(Task task) {
@@ -239,5 +253,106 @@ public class Chotu {
         } catch (NumberFormatException e) {
             throw new ChotuException("Sir, that task number is not valid. Try a number like 1, 2, 3.");
         }
+    }
+
+    private static void loadTasksFromDisk() {
+        int skipped = 0;
+        try {
+            List<String> lines = Files.readAllLines(DATA_FILE);
+            for (String line : lines) {
+                if (line == null) {
+                    continue;
+                }
+                String trimmed = line.trim();
+                if (trimmed.isEmpty()) {
+                    continue;
+                }
+                String[] parts = trimmed.split("\\s*\\|\\s*");
+                if (parts.length < 3) {
+                    skipped++;
+                    continue;
+                }
+                String type = parts[0];
+                String doneFlag = parts[1];
+                String description = parts[2];
+                if (description.isEmpty()) {
+                    skipped++;
+                    continue;
+                }
+
+                Task task;
+                if (type.equals("T")) {
+                    task = new Todo(description);
+                } else if (type.equals("D")) {
+                    if (parts.length < 4) {
+                        skipped++;
+                        continue;
+                    }
+                    task = new Deadline(description, parts[3]);
+                } else if (type.equals("E")) {
+                    if (parts.length < 5) {
+                        skipped++;
+                        continue;
+                    }
+                    task = new Event(description, parts[3], parts[4]);
+                } else {
+                    skipped++;
+                    continue;
+                }
+
+                if (doneFlag.equals("1")) {
+                    task.setDone(true);
+                } else if (doneFlag.equals("0")) {
+                    task.setDone(false);
+                } else {
+                    skipped++;
+                    continue;
+                }
+
+                if (numTasks >= tasks.length) {
+                    skipped++;
+                    break;
+                }
+                tasks[numTasks] = task;
+                numTasks++;
+            }
+        } catch (IOException e) {
+            System.out.println(DIVIDER + "Warning: I couldn't read saved tasks.\n" + DIVIDER);
+            return;
+        }
+
+        if (skipped > 0) {
+            System.out.println(DIVIDER + "Warning: I skipped " + skipped + " corrupted task line(s) in saved data.\n" + DIVIDER);
+        }
+    }
+
+    private static void saveTasksToDisk() {
+        try {
+            StringBuilder content = new StringBuilder();
+            for (int i = 0; i < numTasks; i++) {
+                Task task = tasks[i];
+                content.append(serializeTask(task));
+                if (i < numTasks - 1) {
+                    content.append(System.lineSeparator());
+                }
+            }
+            Files.write(DATA_FILE, content.toString().getBytes());
+        } catch (IOException e) {
+            System.out.println(DIVIDER + "Warning: I couldn't save your tasks.\n" + DIVIDER);
+        }
+    }
+
+    private static String serializeTask(Task task) {
+        String doneFlag = task.isDone() ? "1" : "0";
+        if (task instanceof Todo) {
+            return "T | " + doneFlag + " | " + task.getDescription();
+        } else if (task instanceof Deadline) {
+            Deadline deadline = (Deadline) task;
+            return "D | " + doneFlag + " | " + deadline.getDescription() + " | " + deadline.getBy();
+        } else if (task instanceof Event) {
+            Event event = (Event) task;
+            return "E | " + doneFlag + " | " + event.getDescription() + " | " + event.from + " | " + event.to;
+        }
+        return "T | " + doneFlag + " | " + task.getDescription();
     }
 }
