@@ -240,21 +240,8 @@ public class Chotu {
     }
 
     public static void findTasks(String input) {
-        String keyword = input.substring("find".length()).trim();
-        if (keyword.isEmpty()) {
-            throw new ChotuException("Sir, please include a keyword. Example: find book");
-        }
-
+        String keyword = parser.parseFindKeyword(input);
         ArrayList<Task> matches = tasks.findByKeyword(keyword);
-        if (matches.isEmpty()) {
-            ui.show(Ui.DIVIDER + "I couldn't find matching tasks.\n" + Ui.DIVIDER);
-            return;
-        }
-
-        ui.show(Ui.DIVIDER + "Here are the matching tasks in your list:\n");
-        for (int i = 0; i < matches.size(); i++) {
-            ui.show(" " + (i + 1) + "." + matches.get(i) + "\n");
-        }
-        ui.show(Ui.DIVIDER);
+        ui.showMatchingTasks(matches);
     }
 }

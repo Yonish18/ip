@@ -10,4 +10,12 @@ public class Parser {
         String[] parts = trimmed.split("\\s+", 2);
         return parts[0].toLowerCase();
     }
+
+    public String parseFindKeyword(String input) {
+        String keyword = input.substring("find".length()).trim();
+        if (keyword.isEmpty()) {
+            throw new ChotuException("Sir, please include a keyword. Example: find book");
+        }
+        return keyword;
+    }
 }
