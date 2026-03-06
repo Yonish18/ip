@@ -4,12 +4,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.Scanner;
 
 public class Chotu {
 
-    private static final String DIVIDER = "▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓\n";
-    private static final Scanner SCANNER = new Scanner(System.in);
+    private static final Ui ui = new Ui();
     private static ArrayList<Task> tasks = new ArrayList<>();
     private static final Path DATA_DIR = Paths.get("data");
     private static final Path DATA_FILE = DATA_DIR.resolve("Chotu.txt");
@@ -26,18 +24,18 @@ public class Chotu {
                     " ╚════════════════════════════════════════════════════════╝\n" +
                     " Enter your choice (1-2): ";
 
-    private static String welcomeMsg = DIVIDER +
+    private static String welcomeMsg = Ui.DIVIDER +
             " >> CHOTU ACTIVATED <<\n" +
             " Namaste! I'm Chotu\n" +
             " Your wish is my command. What can I do for you?\n";
 
 
-    private static String exitMsg = DIVIDER +
+    private static String exitMsg = Ui.DIVIDER +
             "Bye-Bye. Have a good day! Jai Shree Ram!\n" +
-            DIVIDER;
+            Ui.DIVIDER;
 
     private static String buildTaskMenuMsg() {
-        return DIVIDER
+        return Ui.DIVIDER
                 + "TASK MANAGER MENU\n\n"
                 + "Type 'list' to list your added tasks.\n"
                 + "Type 'mark'/'unmark' [TASK NUMBER] to mark tasks as done/not done.\n"
@@ -52,8 +50,8 @@ public class Chotu {
     public static void main(String[] args) {
 
         loadTasksFromDisk();
-        System.out.println(welcomeMsg);
-        System.out.print(menu);
+        ui.show(welcomeMsg);
+        ui.show(menu);
         String choice = getValidChoice(takeUserInput());
 
         switch (choice) {
@@ -65,13 +63,13 @@ public class Chotu {
                 taskManager();
                 break;
             }
-        System.out.println(exitMsg);
+        ui.show(exitMsg);
         //use this to test branching22
         }
 
 
     public static void taskManager() throws ChotuException {
-        System.out.println(TaskMenuMsg);
+        ui.show(TaskMenuMsg + "\n");
         String input = takeUserInput();
         while(!input.equalsIgnoreCase("bye")) {
             String inputLowercase = input.toLowerCase().trim();
@@ -100,7 +98,7 @@ public class Chotu {
                 if (message == null || message.trim().isEmpty()) {
                     message = "Sir, kindly enter a VALID input >:( ";
                 }
-                System.out.println(DIVIDER + message + "\n" + DIVIDER);
+                ui.show(Ui.DIVIDER + message + "\n" + Ui.DIVIDER);
             }
             input = takeUserInput();
         }
@@ -108,42 +106,42 @@ public class Chotu {
 
     public static String getValidChoice(String choice) {
         while (!(isValidChoice(choice))) {
-            System.out.println(DIVIDER + "Please enter a valid choice!");
+            ui.show(Ui.DIVIDER + "Please enter a valid choice!\n");
             choice = takeUserInput();
         }
         return choice;
     }
 
     public static void echo() {
-        System.out.print(DIVIDER + "Welcome to Echo mode. I'll repeat what you say!\n");
+        ui.show(Ui.DIVIDER + "Welcome to Echo mode. I'll repeat what you say!\n");
         String userInput = takeUserInput();
         while (!(userInput.equalsIgnoreCase("bye"))) {
-            System.out.println(DIVIDER + userInput + "\n" + DIVIDER);
+            ui.show(Ui.DIVIDER + userInput + "\n" + Ui.DIVIDER);
             userInput = takeUserInput();
         }
     }
 
     public static String takeUserInput() {
-        return SCANNER.nextLine();
+        return ui.readCommand();
     }
 
     public static void addItem(Task task) {
         tasks.add(task);
-        System.out.println(DIVIDER + "added: " + task + "\n" + DIVIDER);
+        ui.show(Ui.DIVIDER + "added: " + task + "\n" + Ui.DIVIDER);
         saveTasksToDisk();
     }
 
     public static void listTasks() {
         if (tasks.size() == 0) {
-            System.out.println(DIVIDER + " Your list is empty, congrats! You have no work. Add some tasks if you want.\n" + DIVIDER);
+            ui.show(Ui.DIVIDER + " Your list is empty, congrats! You have no work. Add some tasks if you want.\n" + Ui.DIVIDER);
             return;
         }
 
-        System.out.println(DIVIDER + " Here are the tasks in your list:");
+        ui.show(Ui.DIVIDER + " Here are the tasks in your list:\n");
         for (int i = 0; i < tasks.size(); i++) {
-            System.out.println(" " + (i + 1) + "." + tasks.get(i));
+            ui.show(" " + (i + 1) + "." + tasks.get(i) + "\n");
         }
-        System.out.print(DIVIDER);
+        ui.show(Ui.DIVIDER);
     }
 
     public static boolean isValidChoice(String choice) {
@@ -156,13 +154,13 @@ public class Chotu {
 
     public static void markDone(int index) {
         tasks.get(index).setDone(true);
-        System.out.println(DIVIDER + "Nice! I've marked this task as done:\n" + " " + tasks.get(index) + "\n" + DIVIDER);
+        ui.show(Ui.DIVIDER + "Nice! I've marked this task as done:\n" + " " + tasks.get(index) + "\n" + Ui.DIVIDER);
         saveTasksToDisk();
     }
 
     public static void markUndone(int index) {
         tasks.get(index).setDone(false);
-        System.out.println(DIVIDER + "OK, I've marked this task as not done yet:\n" + " " + tasks.get(index) + "\n" + DIVIDER);
+        ui.show(Ui.DIVIDER + "OK, I've marked this task as not done yet:\n" + " " + tasks.get(index) + "\n" + Ui.DIVIDER);
         saveTasksToDisk();
     }
 
@@ -229,10 +227,10 @@ public class Chotu {
     }
 
     private static void printAddedTask(Task task) {
-        System.out.println(DIVIDER + " Got it. I've added this task:\n" +
+        ui.show(Ui.DIVIDER + " Got it. I've added this task:\n" +
                 "  " + task + "\n" +
                 " Now you have " + tasks.size() + " tasks in the list.\n" +
-                DIVIDER);
+                Ui.DIVIDER);
     }
 
     private static int parseTaskIndex(String input, String command) {
@@ -323,12 +321,12 @@ public class Chotu {
                 tasks.add(task);
             }
         } catch (IOException e) {
-            System.out.println(DIVIDER + "Warning: I couldn't read saved tasks.\n" + DIVIDER);
+            ui.show(Ui.DIVIDER + "Warning: I couldn't read saved tasks.\n" + Ui.DIVIDER);
             return;
         }
 
         if (skipped > 0) {
-            System.out.println(DIVIDER + "Warning: I skipped " + skipped + " corrupted task line(s) in saved data.\n" + DIVIDER);
+            ui.show(Ui.DIVIDER + "Warning: I skipped " + skipped + " corrupted task line(s) in saved data.\n" + Ui.DIVIDER);
         }
     }
 
@@ -346,7 +344,7 @@ public class Chotu {
             }
             Files.write(DATA_FILE, content.toString().getBytes());
         } catch (IOException e) {
-            System.out.println(DIVIDER + "Warning: I couldn't save your tasks.\n" + DIVIDER);
+            ui.show(Ui.DIVIDER + "Warning: I couldn't save your tasks.\n" + Ui.DIVIDER);
         }
     }
 
