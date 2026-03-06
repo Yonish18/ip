@@ -256,6 +256,9 @@ public class Chotu {
     }
 
     private static void loadTasksFromDisk() {
+        if (!Files.exists(DATA_FILE)) {
+            return;
+        }
         int skipped = 0;
         try {
             List<String> lines = Files.readAllLines(DATA_FILE);
@@ -326,8 +329,10 @@ public class Chotu {
         }
     }
 
+    
     private static void saveTasksToDisk() {
         try {
+            Files.createDirectories(DATA_DIR);
             StringBuilder content = new StringBuilder();
             for (int i = 0; i < numTasks; i++) {
                 Task task = tasks[i];
