@@ -1,10 +1,8 @@
-import java.util.ArrayList;
-
 public class Chotu {
 
     private static final Ui ui = new Ui();
     private static final Storage storage = new Storage("data/Chotu.txt");
-    private static ArrayList<Task> tasks = new ArrayList<>();
+    private static TaskList tasks = new TaskList();
     private static String TaskMenuMsg = buildTaskMenuMsg();
     private static String menu =
             " ╔════════════════════════════════════════════════════════╗\n" +
@@ -43,7 +41,7 @@ public class Chotu {
 
     public static void main(String[] args) {
 
-        storage.loadTasks(tasks, ui);
+        storage.loadTasks(tasks.asList(), ui);
         ui.show(welcomeMsg);
         ui.show(menu);
         String choice = getValidChoice(takeUserInput());
@@ -122,11 +120,11 @@ public class Chotu {
     public static void addItem(Task task) {
         tasks.add(task);
         ui.show(Ui.DIVIDER + "added: " + task + "\n" + Ui.DIVIDER);
-        storage.saveTasks(tasks, ui);
+        storage.saveTasks(tasks.asList(), ui);
     }
 
     public static void listTasks() {
-        if (tasks.size() == 0) {
+        if (tasks.isEmpty()) {
             ui.show(Ui.DIVIDER + " Your list is empty, congrats! You have no work. Add some tasks if you want.\n" + Ui.DIVIDER);
             return;
         }
@@ -147,15 +145,15 @@ public class Chotu {
     }
 
     public static void markDone(int index) {
-        tasks.get(index).setDone(true);
+        tasks.markDone(index);
         ui.show(Ui.DIVIDER + "Nice! I've marked this task as done:\n" + " " + tasks.get(index) + "\n" + Ui.DIVIDER);
-        storage.saveTasks(tasks, ui);
+        storage.saveTasks(tasks.asList(), ui);
     }
 
     public static void markUndone(int index) {
-        tasks.get(index).setDone(false);
+        tasks.markUndone(index);
         ui.show(Ui.DIVIDER + "OK, I've marked this task as not done yet:\n" + " " + tasks.get(index) + "\n" + Ui.DIVIDER);
-        storage.saveTasks(tasks, ui);
+        storage.saveTasks(tasks.asList(), ui);
     }
 
     public static void addDeadline(String input) {
@@ -179,7 +177,7 @@ public class Chotu {
         Task task = new Deadline(description, by);
         tasks.add(task);
         printAddedTask(task);
-        storage.saveTasks(tasks, ui);
+        storage.saveTasks(tasks.asList(), ui);
     }
 
     public static void addTodo(String input) {
@@ -190,7 +188,7 @@ public class Chotu {
         Task task = new Todo(description);
         tasks.add(task);
         printAddedTask(task);
-        storage.saveTasks(tasks, ui);
+        storage.saveTasks(tasks.asList(), ui);
     }
 
     public static void addEvent(String input) {
@@ -217,7 +215,7 @@ public class Chotu {
         Task task = new Event(description, from, to);
         tasks.add(task);
         printAddedTask(task);
-        storage.saveTasks(tasks, ui);
+        storage.saveTasks(tasks.asList(), ui);
     }
 
     private static void printAddedTask(Task task) {
@@ -248,9 +246,8 @@ public class Chotu {
     }
 
     public static void deleteTask(int index) {
-        Task task = tasks.get(index);
-        tasks.remove(index);
-        storage.saveTasks(tasks, ui);
+        Task task = tasks.remove(index);
+        storage.saveTasks(tasks.asList(), ui);
         System.out.println("OK, I have deleted *" + task + "* from your list");
         listTasks();
     }
