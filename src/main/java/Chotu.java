@@ -258,6 +258,7 @@ public class Chotu {
     public static void deleteTask(int index) {
         Task task = tasks.get(index);
         tasks.remove(index);
+        saveTasksToDisk();
         System.out.println("OK, I have deleted *" + task + "* from your list");
         listTasks();
     }
