@@ -6,7 +6,6 @@ public class Chotu {
     private static final String DIVIDER = "▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓\n";
     private static final Scanner SCANNER = new Scanner(System.in);
     private static ArrayList<Task> tasks = new ArrayList<>();
-    //private static int numTasks = 0; ( use arraylist.size() )
     private static String TaskMenuMsg = buildTaskMenuMsg();
     private static String menu =
             " ╔════════════════════════════════════════════════════════╗\n" +
@@ -117,7 +116,6 @@ public class Chotu {
 
     public static void addItem(Task task) {
         tasks.add(task);
-        //numTasks += 1;
         System.out.println(DIVIDER + "added: " + task + "\n" + DIVIDER);
     }
 
@@ -182,7 +180,6 @@ public class Chotu {
 
         Task task = new Deadline(description, by);
         tasks.add(task);
-        //numTasks++;
         printAddedTask(task);
     }
 
@@ -193,7 +190,6 @@ public class Chotu {
         }
         Task task = new Todo(description);
         tasks.add(task);
-        //numTasks++;
         printAddedTask(task);
     }
 
@@ -220,7 +216,6 @@ public class Chotu {
         }
         Task task = new Event(description, from, to);
         tasks.add(task);
-        //numTasks++;
         printAddedTask(task);
     }
 
