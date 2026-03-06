@@ -72,9 +72,9 @@ public class Chotu {
                 } else if (commandWord.equals("bye")) {
                     break;
                 } else if (commandWord.equals("mark")) {
-                    markDone(parseTaskIndex(input, "mark"));
+                    markDone(tasks.parseTaskIndex(input, "mark"));
                 } else if (commandWord.equals("unmark")) {
-                    markUndone(parseTaskIndex(input, "unmark"));
+                    markUndone(tasks.parseTaskIndex(input, "unmark"));
                 } else if (commandWord.equals("todo")) {
                     addTodo(input);
                 } else if (commandWord.equals("deadline")) {
@@ -82,7 +82,7 @@ public class Chotu {
                 } else if (commandWord.equals("event")) {
                     addEvent(input);
                 } else if (commandWord.equals("delete")) {
-                    deleteTask(parseTaskIndex(input, "delete"));
+                    deleteTask(tasks.parseTaskIndex(input, "delete"));
                 } else {
                     throw new ChotuException("Kind sir, please enlighten me what that means. I don't understand that command.");
                 }
@@ -224,26 +224,6 @@ public class Chotu {
                 "  " + task + "\n" +
                 " Now you have " + tasks.size() + " tasks in the list.\n" +
                 Ui.DIVIDER);
-    }
-
-    private static int parseTaskIndex(String input, String command) {
-        /**
-         * Parses a task index from user input.
-         * Strips the command word, converts the remaining number to a 0-based index.
-         */
-        String remainder = input.substring(command.length()).trim();
-        if (remainder.isEmpty()) {
-            throw new ChotuException("Sir, please include the task number, like \"" + command + " 2\".");
-        }
-        try {
-            int index = Integer.parseInt(remainder) - 1;
-            if (index < 0 || index >= tasks.size()) {
-                throw new ChotuException("Sir, that task number doesn't exist. Must be a ghost task. You have " + tasks.size() + " tasks.");
-            }
-            return index;
-        } catch (NumberFormatException e) {
-            throw new ChotuException("Sir, that task number is not valid. Try a number like 1, 2, 3.");
-        }
     }
 
     public static void deleteTask(int index) {

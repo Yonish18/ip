@@ -35,6 +35,22 @@ public class TaskList {
         tasks.get(index).setDone(false);
     }
 
+    public int parseTaskIndex(String input, String command) {
+        String remainder = input.substring(command.length()).trim();
+        if (remainder.isEmpty()) {
+            throw new ChotuException("Sir, please include the task number, like \"" + command + " 2\".");
+        }
+        try {
+            int index = Integer.parseInt(remainder) - 1;
+            if (index < 0 || index >= tasks.size()) {
+                throw new ChotuException("Sir, that task number doesn't exist. Must be a ghost task. You have " + tasks.size() + " tasks.");
+            }
+            return index;
+        } catch (NumberFormatException e) {
+            throw new ChotuException("Sir, that task number is not valid. Try a number like 1, 2, 3.");
+        }
+    }
+
     public ArrayList<Task> asList() {
         return tasks;
     }
