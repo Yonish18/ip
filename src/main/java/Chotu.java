@@ -34,6 +34,8 @@ public class Chotu {
                 + "Enter the tasks you would like to add to your list.\n"
                 + "Type 'list' to list your added tasks.\n"
                 + "Type 'mark'/'unmark' [ITEM NUMBER] to mark tasks as done/not done.\n"
+                + "Type 'event EVENT_NAME /from START_DETAILS /to END_DETAILS' to add an event.\n"
+                + "Type 'deadline return book /by DAY to add a deadline.\n"
                 + "Type 'bye' to exit";
     }
 
