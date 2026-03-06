@@ -36,7 +36,7 @@ public class Chotu {
                 + "Type 'mark'/'unmark' [TASK NUMBER] to mark tasks as done/not done.\n"
                 + "Type 'todo [DESCRIPTION]' to add a todo task."
                 + "Type 'event [DESCRIPTION] /from [START_DETAILS] /to [END_DETAILS]' to add an event.\n"
-                + "Type 'deadline [DESCRIPTION] /by [DEADLINE]' to add a deadline.\n"
+                + "Type 'deadline [DESCRIPTION] /by [yyyy-MM-dd]' to add a deadline.\n"
                 + "Type 'delete [TASK NUMBER]' to delete a task from your list.\n"
                 + "Type 'find [KEYWORD]' to find matching tasks.\n"
                 + "Type 'bye' to exit";

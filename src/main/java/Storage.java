@@ -42,21 +42,26 @@ public class Storage {
                 }
 
                 Task task;
-                if (type.equals("T")) {
-                    task = new Todo(description);
-                } else if (type.equals("D")) {
-                    if (parts.length < 4) {
+                try {
+                    if (type.equals("T")) {
+                        task = new Todo(description);
+                    } else if (type.equals("D")) {
+                        if (parts.length < 4) {
+                            skipped++;
+                            continue;
+                        }
+                        task = new Deadline(description, parts[3]);
+                    } else if (type.equals("E")) {
+                        if (parts.length < 5) {
+                            skipped++;
+                            continue;
+                        }
+                        task = new Event(description, parts[3], parts[4]);
+                    } else {
                         skipped++;
                         continue;
                     }
-                    task = new Deadline(description, parts[3]);
-                } else if (type.equals("E")) {
-                    if (parts.length < 5) {
-                        skipped++;
-                        continue;
-                    }
-                    task = new Event(description, parts[3], parts[4]);
-                } else {
+                } catch (ChotuException e) {
                     skipped++;
                     continue;
                 }
