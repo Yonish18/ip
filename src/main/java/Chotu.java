@@ -31,11 +31,13 @@ public class Chotu {
 
     private static String buildTaskMenuMsg() {
         return DIVIDER
-                + "Enter the tasks you would like to add to your list.\n"
+                + "TASK MANAGER MENU\n\n"
                 + "Type 'list' to list your added tasks.\n"
-                + "Type 'mark'/'unmark' [ITEM NUMBER] to mark tasks as done/not done.\n"
-                + "Type 'event EVENT_NAME /from START_DETAILS /to END_DETAILS' to add an event.\n"
-                + "Type 'deadline return book /by DAY to add a deadline.\n"
+                + "Type 'mark'/'unmark' [TASK NUMBER] to mark tasks as done/not done.\n"
+                + "Type 'todo [DESCRIPTION]' to add a todo task."
+                + "Type 'event [DESCRIPTION] /from [START_DETAILS] /to [END_DETAILS]' to add an event.\n"
+                + "Type 'deadline [DESCRIPTION] /by [DEADLINE]' to add a deadline.\n"
+                + "Type 'delete [TASK NUMBER]' to delete a task from your list"
                 + "Type 'bye' to exit";
     }
 
@@ -79,6 +81,8 @@ public class Chotu {
                     addDeadline(input);
                 } else if (inputLowercase.startsWith("event")) {
                     addEvent(input);
+                } else if (inputLowercase.startsWith("delete")) {
+                    deleteTask(parseTaskIndex(input, "delete"));
                 } else {
                     throw new ChotuException("Kind sir, please enlighten me what that means. I don't understand that command.");
                 }
@@ -141,23 +145,13 @@ public class Chotu {
     }
 
     public static void markDone(int index) {
-        if (index < 0 || index >= tasks.size()) {
-            throw new ChotuException("Sir, that task number does not exist. I cannot mark a ghost task.");
-        }
         tasks.get(index).setDone(true);
         System.out.println(DIVIDER + "Nice! I've marked this task as done:\n" + " " + tasks.get(index) + "\n" + DIVIDER);
     }
 
     public static void markUndone(int index) {
-        if (index < 0 || index >= tasks.size()) {
-            throw new ChotuException("Sir, that task number does not exist. I cannot unmark thin air.");
-        }
         tasks.get(index).setDone(false);
         System.out.println(DIVIDER + "OK, I've marked this task as not done yet:\n" + " " + tasks.get(index) + "\n" + DIVIDER);
-    }
-
-    public static void createToDo(String todo) {
-
     }
 
     public static void addDeadline(String input) {
@@ -227,14 +221,29 @@ public class Chotu {
     }
 
     private static int parseTaskIndex(String input, String command) {
+        /**
+         * Parses a task index from user input.
+         * Strips the command word, converts the remaining number to a 0-based index.
+         */
         String remainder = input.substring(command.length()).trim();
         if (remainder.isEmpty()) {
             throw new ChotuException("Sir, please include the task number, like \"" + command + " 2\".");
         }
         try {
-            return Integer.parseInt(remainder) - 1;
+            int index = Integer.parseInt(remainder) - 1;
+            if (index < 0 || index >= tasks.size()) {
+                throw new ChotuException("Sir, that task number doesn't exist. Must be a ghost task. You have " + tasks.size() + " tasks.");
+            }
+            return index;
         } catch (NumberFormatException e) {
             throw new ChotuException("Sir, that task number is not valid. Try a number like 1, 2, 3.");
         }
+    }
+
+    public static void deleteTask(int index) {
+        Task task = tasks.get(index);
+        tasks.remove(index);
+        System.out.println("OK, I have deleted *" + task + "* from your list");
+        listTasks();
     }
 }
