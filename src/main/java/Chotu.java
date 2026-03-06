@@ -2,6 +2,7 @@ public class Chotu {
 
     private static final Ui ui = new Ui();
     private static final Storage storage = new Storage("data/Chotu.txt");
+    private static final Parser parser = new Parser();
     private static TaskList tasks = new TaskList();
     private static String TaskMenuMsg = buildTaskMenuMsg();
     private static String menu =
@@ -64,23 +65,23 @@ public class Chotu {
         ui.show(TaskMenuMsg + "\n");
         String input = takeUserInput();
         while(!input.equalsIgnoreCase("bye")) {
-            String inputLowercase = input.toLowerCase().trim();
+            String commandWord = parser.getCommandWord(input);
             try {
-                if ((inputLowercase.startsWith("list"))) {
+                if (commandWord.equals("list")) {
                     listTasks();
-                } else if (inputLowercase.startsWith("bye")) {
+                } else if (commandWord.equals("bye")) {
                     break;
-                } else if (inputLowercase.startsWith("mark")) {
+                } else if (commandWord.equals("mark")) {
                     markDone(parseTaskIndex(input, "mark"));
-                } else if (inputLowercase.startsWith("unmark")) {
+                } else if (commandWord.equals("unmark")) {
                     markUndone(parseTaskIndex(input, "unmark"));
-                } else if (inputLowercase.startsWith("todo")) {
+                } else if (commandWord.equals("todo")) {
                     addTodo(input);
-                } else if (inputLowercase.startsWith("deadline")) {
+                } else if (commandWord.equals("deadline")) {
                     addDeadline(input);
-                } else if (inputLowercase.startsWith("event")) {
+                } else if (commandWord.equals("event")) {
                     addEvent(input);
-                } else if (inputLowercase.startsWith("delete")) {
+                } else if (commandWord.equals("delete")) {
                     deleteTask(parseTaskIndex(input, "delete"));
                 } else {
                     throw new ChotuException("Kind sir, please enlighten me what that means. I don't understand that command.");
