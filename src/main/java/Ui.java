@@ -50,5 +50,6 @@ public class Ui {
             show(" " + (i + 1) + "." + matches.get(i) + "\n");
         }
         show(DIVIDER);
+        
     }
 }
